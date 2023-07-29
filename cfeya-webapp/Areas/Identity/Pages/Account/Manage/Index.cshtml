@@ -1,0 +1,181 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+    var notification = TempData["Notification"];
+}
+
+
+<style>
+    .profilePic {
+        cursor: pointer;
+        border: 1px solid;
+    }
+</style>
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+
+@if (notification != null)
+{
+    <div class="alert alert-success" role="alert">
+        <i class="bi bi-check-circle-fill" style="margin-right:10px;"></i>
+        @TempData["Notification"]
+        <button type="button" style="float:right;" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form id="profile-form" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-6">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* <div class="form-floating">
+            <input asp-for="Username" class="form-control" disabled />
+            <label asp-for="Username" class="form-label"></label>
+            </div>*@
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Firstname" class="form-control" placeholder="First Name" />
+                <label asp-for="Input.Firstname" class="form-label"></label>
+                <span asp-validation-for="Input.Firstname" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Lastname" class="form-control" placeholder="Last Name" />
+                <label asp-for="Input.Lastname" class="form-label"></label>
+                <span asp-validation-for="Input.Lastname" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Middlename" class="form-control" placeholder="Middle Name" />
+                <label asp-for="Input.Middlename" class="form-label"></label>
+                <span asp-validation-for="Input.Middlename" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" placeholder="Email" />
+                <label asp-for="Input.Email" class="form-label"></label>
+                <span asp-validation-for="Input.Email" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.DOB" class="form-control" placeholder="Date of Birth" />
+                <label asp-for="Input.DOB" class="form-label"></label>
+                <span asp-validation-for="Input.DOB" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Gender" class="form-control" placeholder="Gender" />
+                <label asp-for="Input.Gender" class="form-label"></label>
+                <span asp-validation-for="Input.Gender" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Cellphone" class="form-control" placeholder="Cell Phone" />
+                <label asp-for="Input.Cellphone" class="form-label"></label>
+                <span asp-validation-for="Input.Cellphone" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Homephone" class="form-control" placeholder="Home Phone" />
+                <label asp-for="Input.Homephone" class="form-label"></label>
+                <span asp-validation-for="Input.Homephone" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Workphone" class="form-control" placeholder="Work Phone" />
+                <label asp-for="Input.Workphone" class="form-label"></label>
+                <span asp-validation-for="Input.Workphone" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Street" class="form-control" placeholder="Street" />
+                <label asp-for="Input.Street" class="form-label"></label>
+                <span asp-validation-for="Input.Street" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.City" class="form-control" placeholder="City" />
+                <label asp-for="Input.City" class="form-label"></label>
+                <span asp-validation-for="Input.City" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.State" class="form-control" placeholder="State" />
+                <label asp-for="Input.State" class="form-label"></label>
+                <span asp-validation-for="Input.State" class="text-danger form-text"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Zip" class="form-control" placeholder="Zip" />
+                <label asp-for="Input.Zip" class="form-label"></label>
+                <span asp-validation-for="Input.Zip" class="text-danger form-text"></span>
+            </div>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+        </div>
+        <div class="col-md-6">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div>
+                @if (Model.Input.ProfilePicture != null)
+                {
+                    <img id="profilePicture" style="width:350px;height:350px;border-radius:12px; object-fit:cover" src="@Model.Input.ProfilePicture">
+                }
+                else
+                {
+                    <img id="profilePicture" style="width:350px;height:350px;border-radius:12px; object-fit:cover" src="/images/person-bounding-box.svg">
+                }
+                <input hidden class="form-control" id="profilePicLink"
+                       asp-for="Input.ProfilePicture"
+                       style="border:0px;margin-top:5px;width:350px;" />
+                <span asp-validation-for="Input.ProfilePicture" class="text-danger form-text"></span>
+            </div>
+
+            <h3 class="mt-4">Choose your Profile Picture</h3>
+
+            @if (User.IsInRole("Cinderella"))
+            {
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/CinderellaImages/cinderella1.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/CinderellaImages/cinderella2.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/CinderellaImages/cinderella3.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/CinderellaImages/cinderella4.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+            }
+            else
+            {
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/FairyImages/fairy1.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/FairyImages/fairy2.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/FairyImages/fairy3.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+                <img data-bs-toggle="tooltip" class="profilePic"
+                 title="Choose as your Profile Pic"
+                 src="~/images/FairyImages/fairy4.jpg"
+                 style="height:100px;width:100px;border-radius:50px;"
+                 onclick="document.getElementById('profilePicture').src = this.src; document.getElementById('profilePicLink').value=this.src;" />
+            }
+
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+    <script>
+
+    </script>

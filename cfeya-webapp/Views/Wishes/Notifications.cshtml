@@ -1,0 +1,53 @@
+﻿@model IEnumerable<cfeya_webapp.Models.Notification>
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<h1>Notifications</h1>
+
+@foreach (var item in Model)
+{
+    if (item.MarkasRead)
+    {
+        <div class="alert alert-secondary" role="alert">
+            <i class="bi bi-bell"></i>
+            @item.NotificationTitle
+
+            @*<div style="float:right;">
+                <span class="text-danger" style="cursor:pointer" data-bs-toggle="tooltip" title="Remove notification"><i class="bi bi-x-lg"></i></span>
+            </div>*@
+        </div>
+    }
+    else
+    {
+
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-bell-fill"></i>
+            @item.NotificationTitle
+
+            @*<div style="float:right;">
+                <span class="text-danger" style="cursor:pointer" data-bs-toggle="tooltip" title="Remove notification"><i class="bi bi-x-lg"></i></span>
+            </div>*@
+        </div>
+    }
+}
+
+
+<script>
+    
+    $(document).ready(function(){
+        $.ajax({
+            type:"POST",
+            url: "/Wishes/MarknotificationasRead",
+            success:function(data){
+                if(data!="Success"){
+                    alert(data);
+                }
+            },
+            error:function(data){
+                alert(data);
+            }
+        })
+    })
+
+</script>

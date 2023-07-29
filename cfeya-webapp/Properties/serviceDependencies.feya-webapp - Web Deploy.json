@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mssql2": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/feya-dbserver/databases/Feya_DB",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:Feya_DB"
+    }
+  }
+}

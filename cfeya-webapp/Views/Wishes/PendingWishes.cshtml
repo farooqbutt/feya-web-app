@@ -1,0 +1,248 @@
+﻿@model WishPaginationModel<cfeya_webapp.Models.Wishes>
+
+@{
+    ViewData["Title"] = "Pending Wishes";
+    ViewData["Controller"] = "Wishes";
+    ViewData["Action"] = "PendingWishes";
+    var i = 1;
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+}
+<style>
+    tbody tr {
+        cursor: pointer;
+    }
+
+    body {
+        background-color: #D9AFD9;
+        background-image: linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%);
+        color: black
+    }
+</style>
+
+<h1>Pending Wishes</h1>
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th style="width:25%;">
+                Story
+            </th>
+            <th>
+                Wish
+            </th>
+            <th>
+                Created Date
+            </th>
+            <th>
+                Submitted Date
+            </th>
+            <th>
+                Status
+            </th>
+            @*<th>
+            @Html.DisplayNameFor(model => model.Picked_up_date)
+            </th>*@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        @foreach (var item in Model)
+        {
+            <tr onclick="LoadWish(@item.Id)">
+                <td>
+                    @i
+                </td>
+                <td style="width:25%;" data-bs-toggle="tooltip" title="Click to view Full Story" data-bs-placement="bottom">
+                    @if (item.StoryText?.Length > 70)
+                    {
+                        @item.StoryText.Substring(0, 70)
+
+                        <small class="text-muted form-text">...</small>
+                    }
+                    else
+                    {
+                        @item.StoryText
+                    }
+                </td>
+                <td data-bs-toggle="tooltip" title="Click to view Full Wish" data-bs-placement="bottom">
+                    @if (item.WishText?.Length > 150)
+                    {
+                        @item.WishText.Substring(0, 150)
+
+                        <small class="text-muted form-text">...</small>
+                    }
+                    else
+                    {
+                        @item.WishText
+                    }
+                </td>
+                <td>
+                    @item.CreatedDate?.ToShortDateString()
+                </td>
+                <td>
+                    <code>none</code>
+                </td>
+                <td>
+                    <span class="badge rounded-pill text-bg-primary"><i class="bi bi-clock"></i> @item.Status</span>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Picked_up_date)
+                </td>
+                <td>
+                    <button onclick="SubmitWish(@item.Id,event)" 
+                    class="btn btn-sm btn-info" 
+                    data-bs-toggle="tooltip" 
+                    title="submit wish now"
+                    data-bs-placement="right">Submit</button>
+                </td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+<partial name="_PaginationPartial" model="Model" view-data="ViewData" />
+
+
+@*Modal for Showing Wish Details*@
+<!-- Button trigger modal -->
+@*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Launch demo modal
+</button>*@
+
+<!-- Modal -->
+<div class="modal fade" id="WishDetailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Wish Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:justify;">
+                    <h4 style="text-align:center;">Story</h4>
+                    <p id="txtStory"></p>
+                    <h4 style="text-align:center;">Wish</h4>
+                    <p id="txtWish"></p><hr />
+                    <div class="row" style="text-align:center;">
+                        <div class="col-md-4">
+                            <span data-bs-toggle="tooltip" title="Wish Created Date">
+                                <i class="bi bi-calendar-event"></i>
+                                <span class="form-text" id="createdDate"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-4">
+                            <span data-bs-toggle="tooltip" title="Wish Submitted Date">
+                                <i class="bi bi-calendar-check"></i>
+                                <span class="form-text" id="submitedDate"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="badge rounded-pill text-bg-primary" data-bs-toggle="tooltip" title="Wish Status">
+                                <i class="bi bi-clock"></i>
+                                <span id="wishStatus"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center w-100">
+    <div id="NoDataToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                No Pending Wishes Found.
+                <a style="color:white;" href="/Wishes/ActiveWishes" data-bs-toggle="tooltip" title="Active Wish">
+                    Go to Active Wishes
+                </a>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+
+    function SubmitWish(id,event){
+
+        event.stopPropagation();
+        $.ajax({
+            type:"POST",
+            url:"/Wishes/SubmitWish",
+            data:{
+                id:id
+            },
+            success:function(data){
+                if(data=="Success"){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Your Wish Submitted Successfully!',
+                        showDenyButton: true,
+                        showCloseButton: true,
+                        denyButtonText: "Go to Active Wishes",
+                        confirmButtonText: "Submit more",
+                    }).then((result)=>{
+                        if (result.isConfirmed){
+                            window.location.reload();
+                        } else if (result.isDenied) {
+                            window.location.href = "/Wishes/ActiveWishes"
+                        }
+                    })
+                }
+            },
+            error:function(data){
+                alert(data);
+            }
+        })
+
+    }
+
+    $(document).ready(function () {
+
+        if (@Model.Count() == 0 && '@User.IsInRole("Cinderella")' == 'True') {
+            const toast = new bootstrap.Toast("#NoDataToast")
+            toast.show()
+        }
+    });
+
+    function LoadWish(wishID) {
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/LoadWishDetails",
+            data: {
+                wishID: wishID
+            },
+            success: function (data) {
+                $("#WishDetailModal").modal("show");
+                $("#txtStory").text(data.storyText);
+                $("#txtWish").text(data.wishText);
+                $("#wishStatus").text(data.status);
+                $("#createdDate").text(data.createdDate.split('T')[0]);
+                $("#submitedDate").text("none");
+            },
+            error: function (data) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data
+                });
+            }
+        });
+    }
+</script>

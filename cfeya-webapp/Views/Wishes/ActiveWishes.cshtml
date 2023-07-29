@@ -1,0 +1,306 @@
+﻿@model WishPaginationModel<cfeya_webapp.Models.Wishes>
+
+@{
+    ViewData["Title"] = "Active Wishes";
+    ViewData["Controller"] = "Wishes";
+    ViewData["Action"] = "ActiveWishes";
+    var i = 1;
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+}
+<style>
+    tbody tr {
+        cursor: pointer;
+    }
+
+    body {
+        background-color: #D9AFD9;
+        background-image: linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%);
+        color:black
+    }
+</style>
+
+<h1>Active Wishes</h1>
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th style="width:25%;">
+                Story
+            </th>
+            <th>
+                Wish
+            </th>
+            <th>
+                Created Date
+            </th>
+            <th>
+                Submitted Date
+            </th>
+            <th>
+                Status
+            </th>
+            @*<th>
+            @Html.DisplayNameFor(model => model.Picked_up_date)
+            </th>*@
+            <th></th>
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        @foreach (var item in Model)
+        {
+            <tr id="WishRow_@item.Id">
+                <td>
+                    @i
+                </td>
+                <td onclick="LoadWish(@item.Id)" style="width:25%;" data-bs-toggle="tooltip" title="Click to view Full Story" data-bs-placement="bottom">
+                    @if (item.StoryText?.Length > 70)
+                    {
+                        @item.StoryText.Substring(0, 70)
+
+                        <small class="text-muted form-text">...</small>
+                    }
+                    else
+                    {
+                        @item.StoryText
+                    }
+                </td>
+                <td onclick="LoadWish(@item.Id)" data-bs-toggle="tooltip" title="Click to view Full Wish" data-bs-placement="bottom">
+                    @if (item.WishText?.Length > 150)
+                    {
+                        @item.WishText.Substring(0, 150)
+
+                        <small class="text-muted form-text">...</small>
+                    }
+                    else
+                    {
+                        @item.WishText
+                    }
+                </td>
+                <td>
+                    @item.CreatedDate?.ToShortDateString()
+                </td>
+                <td>
+                    @item.SubmitedDate?.ToShortDateString()
+                </td>
+                <td>
+                    @if (item.Status == "Floating in the Wish Clouds")
+                    {
+                        <span class="badge rounded-pill" style="background-color:#0D6EFD;">
+                            <i class="bi bi-cloud-haze2"></i> @item.Status
+                        </span>
+                    }
+                    else if (item.Status == "Discovered by a Fairy")
+                    {
+                        <span class="badge rounded-pill" style="background-color:#6610f2;">
+                            <i class="bi bi-search"></i> @item.Status
+                        </span>
+                    }
+                    else if (item.Status == "Wish is being Fulfilled")
+                    {
+                        <span class="badge rounded-pill" style="background-color:#20c997;">
+                            <i class="bi bi-clipboard-check"></i> @item.Status
+                        </span>
+                    }
+                    else if (item.Status == "Fulfilled")
+                    {
+                        <span class="badge rounded-pill" style="background-color:#198754;">
+                            <i class="bi bi-check2-circle"></i> @item.Status
+                        </span>
+                        <button data-bs-toggle="tooltip" style="border:none;" onclick="WishReceived(@item.Id)"
+                        title="if you have received this item then click received."
+                        class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-envelope-check"></i> Received
+                        </button>
+                    }
+                    else
+                    {
+                        <span class="badge rounded-pill" style="background-color:#ffc107;">
+                            <i class="bi bi-person-check"></i> @item.Status
+                        </span>
+                    }
+                </td>
+                @*<td>
+            @Html.DisplayFor(modelItem => item.Picked_up_date)
+            </td>*@
+                <td>
+                </td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+<partial name="_PaginationPartial" model="Model" view-data="ViewData"/>
+
+@*Modal for Showing Wish Details*@
+<!-- Button trigger modal -->
+@*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Launch demo modal
+</button>*@
+
+<!-- Modal -->
+<div class="modal fade" id="WishDetailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Wish Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:justify;">
+                    <h4 style="text-align:center;">Story</h4>
+                    <p id="txtStory"></p>
+                    <h4 style="text-align:center;">Wish</h4>
+                    <p id="txtWish"></p><hr />
+                    <div class="row" style="text-align:center;">
+                        <div class="col-md-4">
+                            <span data-bs-toggle="tooltip" title="Wish Created Date">
+                                <i class="bi bi-calendar-event"></i>
+                                <span class="form-text" id="createdDate"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-4">
+                            <span data-bs-toggle="tooltip" title="Wish Submitted Date">
+                                <i class="bi bi-calendar-check"></i>
+                                <span class="form-text" id="submitedDate"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-4" id="StatusBadge">
+                            @*<span class="badge rounded-pill" style="background-color:#0D6EFD" data-bs-toggle="tooltip" title="Wish Status">
+                            <i class="bi bi-check-circle"></i>
+                            <span id="wishStatus"></span>
+                            </span>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center w-100">
+    <div id="NoDataToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                No Wishes Found. Please First Add Some!
+                <a style="color:white;" href="/Home/Cinderella" data-bs-toggle="tooltip" title="Click to Add Wish"><i class="bi bi-plus-square"></i></a>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+        if (@Model.Count() == 0 && '@User.IsInRole("Cinderella")' == 'True') {
+            const toast = new bootstrap.Toast("#NoDataToast")
+            toast.show()
+        }
+    });
+
+    function WishStatusMaker(Status, id) {
+        if (Status == "Floating in the Wish Clouds") {
+            return `
+                                    <span id="hellotip" class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#0D6EFD;">
+                                            <i class="bi bi-cloud-haze2"></i> ${Status}
+                                    </span>`;
+        }
+        else if (Status == "Discovered by a Fairy") {
+            return `
+                                    <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#6610f2;">
+                                        <i class="bi bi-search"></i> ${Status}
+                                    </span>`;
+        }
+        else if (Status == "Wish is being Fulfilled") {
+            return `
+                                    <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#20c997;">
+                                        <i class="bi bi-clipboard-check"></i> ${Status}
+                                    </span>`;
+        }
+        else if (Status == "Fulfilled") {
+            return `
+                                    <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#198754;">
+                                        <i class="bi bi-check2-circle"></i> ${Status}
+                                    </span>
+                                            <button data-bs-toggle="tooltip" style="border:none;" onclick="WishReceived(${id})"
+                                title="if you have received this item then click received."
+                                class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-envelope-check"></i> Received
+                                </button>`;
+        }
+        else {
+            return `
+                                    <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#ffc107;">
+                                        <i class="bi bi-person-check"></i> ${Status}
+                                    </span>`;
+        }
+    }
+
+    function LoadWish(wishID) {
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/LoadWishDetails",
+            data: {
+                wishID: wishID
+            },
+            success: function (data) {
+                $("#WishDetailModal").modal("show");
+                $("#txtStory").text(data.storyText);
+                $("#txtWish").text(data.wishText);
+                $("#StatusBadge").html(WishStatusMaker(data.status, data.id));
+                $("#createdDate").text(data.createdDate.split('T')[0]);
+                $("#submitedDate").text(data.submitedDate.split('T')[0]);
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            },
+            error: function (data) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data
+                });
+            }
+        });
+    }
+
+    function WishReceived(id) {
+        $.ajax({
+            type: "POST",
+            url: "/Wishes/WishReceived",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                if (data == "Success") {
+                    Toastify({
+                        text: "Wish Status Updated Successfully!",
+                        duration: 3000,
+                        stopOnFocus: true,
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        },
+                    }).showToast();
+                    $("#WishDetailModal").modal("hide");
+                    $("#WishRow_" + id + "").fadeOut(2000, "linear");
+                    //$("#WishRow_" + id + "").attr("hidden", true);
+                }
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+</script>

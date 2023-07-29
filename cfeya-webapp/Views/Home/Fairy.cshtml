@@ -1,0 +1,713 @@
+﻿@using Microsoft.AspNetCore.Identity
+@{
+    ViewData["Title"] = "Fairy";
+    var notification = TempData["StatusMessage"];
+}
+
+<style>
+
+        .modal-backdrop.show {
+            opacity: 0;
+        }
+
+        .textarea-container {
+            position: relative;
+        }
+
+        .textarea-container textarea {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .textarea-container button {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .textarea-container button {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+
+        .wishCardContainer {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            height: 400px;
+            width: 600px;
+            background: #f2f2f2;
+            overflow: hidden;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 0 20px 8px #d0d0d0;
+        }
+
+
+        /*////////Card Styling////////////////*/
+        .content {
+            position: absolute;
+            top: 50%;
+            text-align: justify;
+            color: black;
+            padding: 40px;
+            font-family: 'Merriweather', serif;
+        }
+
+        h1 {
+            font-weight: 900;
+            text-align: center;
+        }
+
+        h3 {
+            font-weight: 300;
+        }
+
+        .cardbody {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            background-size: 140%!important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            color:white;
+        }
+
+    @@ media (min-width: 992px) {
+        .body {
+            background-size: 148vh!important;
+            background-repeat: no-repeat !important;
+            background-position: 50% -31vh!important;
+        }
+    }
+
+    .row {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .social-row {
+        display: flex;
+        flex-direction: column;
+        right: 0;
+        position: absolute;
+    }
+
+    @@ media (min-width: 768px) {
+        .social-row {
+            position: relative;
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+    }
+
+    .social-row a {
+        width: 2em;
+        height: 2em;
+        background-repeat: no-repeat;
+        background-size: contain;
+        padding: 1em 0;
+        z-index: 99;
+        margin-bottom: 1em;
+        margin-right: 1em;
+    }
+
+    @@ media (min-width: 768px) {
+        .social-row a {
+            width: 2.5em;
+            height: 2.5em;
+            padding: 1em 0;
+            margin-bottom: 0;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .social-row a {
+            width: 3em;
+            height: 3em;
+            padding: 0;
+        }
+    }
+
+    .countach {
+        font-family: countach,sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .tilda-petite {
+        font-family: tilda-petite,sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .montserrat {
+        font-family: montserrat, sans-serif;
+        font-weight: 300;
+        font-style: normal;
+    }
+
+    .skintone-text {
+        color: var(--skintone-color);
+    }
+
+    .dark-text {
+        color: var(--dark-color);
+    }
+
+    .white-text {
+        color: #fff;
+    }
+
+    a:hover {
+        color: #c2c2c2;
+    }
+
+    .dark-background {
+        background: var(--dark-color);
+    }
+
+
+    .logo {
+        width: 20vh;
+    }
+
+    @@ media (min-width: 768px) {
+        .logo {
+            width: 16em;
+        }
+    }
+
+    @@ media (min-width: 992px) {
+        .logo {
+            width: 18em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .logo {
+            width: 28vh;
+            height: 28vh;
+        }
+    }
+
+    h1 {
+        font-size: 4.5vh;
+        letter-spacing: 4px;
+        padding-top: .5em;
+    }
+
+    @@ media (min-width: 992px) {
+        h1 {
+            font-size: 2.75em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        h1 {
+            font-size: 3em;
+            letter-spacing: 5px;
+        }
+    }
+
+    .lead {
+        font-size: 1.5rem;
+        padding-top: 0.5em;
+    }
+
+    @@ media (min-width: 992px) {
+        .lead {
+            font-size: 2rem;
+            padding-top: 0.5em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .lead {
+            font-size: 2.5rem;
+            padding-top: 1em;
+        }
+    }
+
+    p.general {
+        font-size: 2.5vh;
+        margin-bottom: 0.5em;
+        line-height: 1.25em;
+    }
+
+    @@ media (min-width: 992px) {
+        p.general {
+            font-size: 1.25em;
+             line-height: 1.5em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        p.general {
+            font-size: 1.5em;
+        }
+    }
+
+
+    .inner-border {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .outer-border {
+        border: 2px solid #DE9B72;
+        height: 99%;
+        width: 98%;
+        padding: 6px;
+        margin: 0 auto;
+    }
+
+    @@ media (min-width: 992px) {
+        .outer-border {
+            height: 94%;
+        }
+    }
+
+    .mid-border {
+        border: 6px solid #DE9B72;
+        height: 100%;
+        width: 100%;
+        padding: 6px;
+        margin: auto;
+    }
+
+    .inner-border {
+        position: relative;
+        border: 2px solid #DE9B72;
+        height: 100%;
+        width: 100%;
+        margin: auto;
+    }
+
+
+    
+    .corner-decoration {
+        position: absolute;
+        width: 3em;
+        margin: -3px;
+    }
+
+    @@ media (min-width: 768px) {
+        .corner-decoration {
+            width: 3.5em;
+            margin: -4px;
+        }
+    }
+
+    @@ media (min-width: 992px) {
+        .corner-decoration {
+            width: 4em;
+            margin: -5px;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .corner-decoration {
+            width: 5em;
+            margin: -6px;
+        }
+    }
+
+    .corner-decoration.corner-left-top {
+        left: 0;
+        top: 0;
+    }
+
+    .corner-decoration.corner-right-top {
+        top: 0;
+        right: 0;
+         -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+    }
+
+    .corner-decoration.corner-right-bottom {
+        right: 0;
+        bottom: 0;
+         -webkit-transform: scale(-1);
+        transform: scale(-1);
+    }
+
+    .corner-decoration.corner-left-bottom {
+        left: 0;
+        bottom: 0;
+        -webkit-transform: scaleY(-1);
+        transform: scaleY(-1);
+    }
+
+
+    .vertical-decoration {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 11em;
+    }
+
+
+    @@ media(min-width: 768px) {
+        .vertical-decoration {
+            width: 16em;
+        }
+    }
+
+
+    @@ media (min-width: 992px) {
+        .vertical-decoration {
+            width: 20em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .vertical-decoration {
+            width: 27em;
+        }
+    }
+
+    .vertical-decoration.top {
+        top: 0;
+
+    }
+
+    .vertical-decoration.bottom {
+        bottom: 0;
+        -webkit-transform: scaleY(-1);
+        transform: scaleY(-1);
+    }
+
+
+</style>
+
+@if (notification != null)
+{
+    <div class="alert alert-success" role="alert">
+        <i class="bi bi-check-circle-fill" style="margin-right:10px;"></i>
+        @TempData["StatusMessage"]
+        <button type="button" style="float:right;margin-right:-97px;" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="p-5 mb-4 rounded-3 text-center text-light">
+    <h1 class="display-5">Welcome to the Fairytale!</h1>
+    <p>
+        Pick Up wishes that you want "<code style="color:white">@User.Identity?.Name</code>"
+    </p>
+    <span id="btnDisabledTooltip2" class="d-inline-block">
+        <button id="btnStart" class="btn btn-primary btn-lg" data-bs-toggle="tooltip" onclick="LaunchWishes()"
+                title="Start Picking Wishes">
+            <i class="bi bi-play-fill"></i> Start
+        </button>
+    </span>
+
+</div>
+
+
+<div class="modal fade" id="WishesModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark" id="exampleModalLabel">
+                    Pick Wishes
+                </h5>
+                <button type="button"
+                        class="btn btn-info"
+                        id="btnTryagain"
+                        data-bs-placement="bottom"
+                        data-bs-toggle="tooltip" title="Fetch more wishes" onclick="LaunchWishesAgain()">
+                    <i class="bi bi-arrow-clockwise"></i> Try Again
+                </button>
+                <a class="btn btn-secondary"
+                   data-bs-toggle="tooltip" title="Close and go to Wishes"
+                   asp-area="" asp-controller="Wishes" asp-action="AllWishes">
+                    Close
+                </a>
+                @*<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>*@
+            </div>
+            <div class="modal-body"
+                 style="background-image:linear-gradient(rgb(68 68 68 / 50%), rgb(103 93 120)), url('../../images/FairyBackground.jfif');
+                        background-color: black;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                        color:black;">
+                <div class="container text-center">
+
+                    <div id="WishContainer1" class="row mb-3">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    //for checking user profile completion
+    $(document).ready(function () {
+        if ('@User.Identity?.IsAuthenticated' == 'True') {
+            $.ajax({
+                url: "/Home/CheckUserProfileStatus",
+                data: {
+                    name: '@User.Identity?.Name'
+                },
+                success: function (data) {
+                    //debugger
+                    if (data == false) {
+                        //profile is not completed
+                        //For Cinderella
+                        $("#btnStory").attr("disabled", true);
+                        $("#btnDisabledTooltip").attr("data-bs-toggle", "tooltip");
+                        $("#btnDisabledTooltip").attr("data-bs-placement", "bottom");
+                        $("#btnDisabledTooltip").attr("title", "Please First Complete your Profile to add Stories!");
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                        //For Fairy
+                        $("#btnStart").attr("disabled", true);
+                        $("#btnDisabledTooltip2").attr("data-bs-toggle", "tooltip");
+                        $("#btnDisabledTooltip2").attr("data-bs-placement", "bottom");
+                        $("#btnDisabledTooltip2").attr("title", "Please First Complete your Profile to Fetch Wishes!");
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+
+                    } else {
+                        //profile is completed
+                        $("#btnStart").attr("disabled", false);
+                        $("#btnStart").attr("disabled", false);
+                    }
+                },
+                error: function (data) {
+                    alert(data);
+                }
+            })
+        }
+    })
+
+    function WishMaker(story, wish, id) {
+        return `<div class="col-6 mb-3 col6wishes"  id="Story_Wish_${id}">
+                            <div class="cardbody">
+                          <div class="outer-border">
+                             <div class="mid-border">
+                                <div class="inner-border">
+                                  <img class="corner-decoration corner-left-top" src="/images/corner-decoration.png"></img>
+                                  <img class="corner-decoration corner-right-top" src="/images/corner-decoration.png"></img>
+                                  <img class="corner-decoration corner-right-bottom" src="/images/corner-decoration.png"></img>
+                                      <img class="corner-decoration corner-left-bottom" src="/images/corner-decoration.png"></img>
+                                          <img class="vertical-decoration top" src="/images/horizontally-centered-vertical-decoration.png">
+                                          <img class="vertical-decoration bottom" src="/images/horizontally-centered-vertical-decoration.png">
+
+                                   <!-- Page Content -->
+                                       <div class="container" style="margin-top: 35px;margin-bottom: 40px;">
+
+                                      <div class="row">
+
+                                         <div class="col-lg-12 text-center">
+                                            <h5 class="card-title">Story</h5>
+                                            <p class="card-text">
+                                            ${story}
+                                            </p>
+                                            <h5 class="card-title">Wish</h5>
+                                            <p class="card-text">
+                                                ${wish}
+                                            </p>
+                                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                                <button type="button" class="btn btn-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+                                                <button type="button" class="btn btn-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+                                            </div>
+
+                                         </div>
+                                      </div>
+                                   </div>
+                                </div>
+                             </div>
+                          </div>
+                    </div>
+                    </div>`;
+    }
+
+    function WishMaker2(story, wish, id) {
+        //return `<div class="col-12 mb-3">
+        //            <div class="card shadow-sm" id="Story_Wish_${id}">
+        //            <div class="card-body">
+        //                <h5 class="card-title">Story</h5>
+        //                <p class="card-text">
+        //                ${stroy}
+        //                </p>
+        //                <h5 class="card-title">Wish</h5>
+        //                <p class="card-text">
+        //                    ${wish}
+        //                </p>
+        //                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+        //                    <button type="button" class="btn btn-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+        //                    <button type="button" class="btn btn-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+        //                </div>
+        //            </div>
+        //        </div>
+        //    </div>`;
+
+        return `
+                            <div class="cardbody mb-3" id="Story_Wish_${id}">
+                      <div class="outer-border">
+                         <div class="mid-border">
+                            <div class="inner-border">
+                              <img class="corner-decoration corner-left-top" src="/images/corner-decoration.png"></img>
+                              <img class="corner-decoration corner-right-top" src="/images/corner-decoration.png"></img>
+                              <img class="corner-decoration corner-right-bottom" src="/images/corner-decoration.png"></img>
+                              <img class="corner-decoration corner-left-bottom" src="/images/corner-decoration.png"></img>
+                                      <img class="vertical-decoration top" src="/images/horizontally-centered-vertical-decoration.png">
+                                      <img class="vertical-decoration bottom" src="/images/horizontally-centered-vertical-decoration.png">
+
+                               <!-- Page Content -->
+                                   <div class="container" style="margin-top: 35px;margin-bottom: 40px;">
+
+                                  <div class="row">
+
+                                     <div class="col-lg-12 text-center">
+                                        <h5 class="card-title">Story</h5>
+                                        <p class="card-text">
+                                        ${story}
+                                        </p>
+                                        <h5 class="card-title">Wish</h5>
+                                        <p class="card-text">
+                                            ${wish}
+                                        </p>
+                                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                            <button type="button" class="btn btn-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+                                            <button type="button" class="btn btn-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+                                        </div>
+
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                </div>
+            `;
+    }
+
+    function LaunchWishes() {
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/GetRandomWishes",
+            success: function (data) {
+                if (data.length != 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 2) {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker2(data[i].storyText, data[i].wishText, data[i].id);
+                        } else {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker(data[i].storyText, data[i].wishText, data[i].id);
+                        }
+                    }
+                    $("#WishesModal").modal("show");
+                    ChangeWishSize();
+                } else {
+                    Swal.fire({
+                        icon: "info",
+                        title: "No Wishes Found",
+                        text: "There are no wishes in the wish clouds! Please try fetching after some time."
+                    })
+                }
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+
+    function LaunchWishesAgain() {
+        $("#WishContainer1").empty();
+        $("#btnTryagain").attr("disabled", true);
+        document.getElementById("btnTryagain").innerHTML =
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                              Loading...`;
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/GetRandomWishes",
+            success: function (data) {
+                if (data.length != 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 2) {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker2(data[i].storyText, data[i].wishText, data[i].id);
+                        } else {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker(data[i].storyText, data[i].wishText, data[i].id);
+                        }
+                    }
+                    ChangeWishSize();
+                } else {
+                    Swal.fire({
+                        icon: "info",
+                        title: "No Wishes Found",
+                        text: "There are no wishes in the wish clouds! Please try fetching after some time."
+                    })
+                }
+                $("#btnTryagain").attr("disabled", false);
+                document.getElementById("btnTryagain").innerHTML = "<i class='bi bi-arrow-clockwise'></i> Try Again";
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+
+    function AcceptWish(id) {
+        $.ajax({
+            type: "POST",
+            url: "/Wishes/AcceptWish",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                Toastify({
+                    text: "Wish Accepted Successfully!",
+                    duration: 2000,
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                }).showToast();
+                //$("#btnAccept_" + id + "").text("Accepted");
+                //$("#btnAccept_" + id + "").attr("disabled", true);
+                $("#Story_Wish_" + id + "").fadeOut(2000, "linear");
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+    function DeclineWish(id) {
+        Toastify({
+            text: "Wish Declined Successfully!",
+            duration: 2000,
+        }).showToast();
+        $("#Story_Wish_" + id + "").fadeOut(2000, "linear");
+    }
+
+
+    function ChangeWishSize() {
+        
+        if (window.innerWidth <= 550) {
+            var wishesLength = document.getElementsByClassName("col-6").length
+            if(wishesLength>0){
+                for(var i=0;i<wishesLength;i++){
+                    document.getElementsByClassName("col-6")[0].classList.remove("col-6")
+                }
+            }
+        }else{
+            var wishesLength = document.getElementsByClassName("col6wishes").length
+            if (wishesLength > 0) {
+                for (var i = 0; i < wishesLength; i++) {
+                    document.getElementsByClassName("col6wishes")[i].classList.add("col-6")
+                }
+            }
+        }        
+    };
+    window.addEventListener("resize", ChangeWishSize);
+
+
+</script>

@@ -1,0 +1,509 @@
+﻿@using Microsoft.AspNetCore.Identity
+@{
+    ViewData["Title"] = "Cinderella";
+    var notification = TempData["StatusMessage"];
+}
+
+<style>
+
+    .modal-backdrop.show {
+        opacity: 0;
+    }
+
+    .textarea-container {
+        position: relative;
+    }
+
+    .textarea-container textarea {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .textarea-container button {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    .textarea-container button {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    .wishCardContainer {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        height: 400px;
+        width: 600px;
+        background: #f2f2f2;
+        overflow: hidden;
+        border-radius: 20px;
+        cursor: pointer;
+        box-shadow: 0 0 20px 8px #d0d0d0;
+    }
+
+    .content {
+        position: absolute;
+        top: 50%;
+        text-align: justify;
+        color: black;
+        padding: 40px;
+        font-family: 'Merriweather', serif;
+    }
+
+    h1 {
+        font-weight: 900;
+        text-align: center;
+    }
+
+    h3 {
+        font-weight: 300;
+    }
+</style>
+
+@if (notification != null)
+{
+    <div class="alert alert-success" role="alert">
+        <i class="bi bi-check-circle-fill" style="margin-right:10px;"></i>
+        @TempData["StatusMessage"]
+        <button type="button" style="float:right;margin-right:-97px;" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="p-5 mb-4 rounded-3 text-center text-light">
+    <h1 class="display-5">Welcome to the Fairytale!</h1>
+    <p>
+        Tell your story and make a wish.
+    </p>
+    <span id="btnDisabledTooltip" class="d-inline-block">
+        <button id="btnStory" class="btn btn-info btn-lg mb-3" style="width:320px;height:65px;">
+            <i class="bi bi-book-half" style="vertical-align:middle;"></i>
+            <span>Story</span>
+        </button>
+    </span>
+
+
+    <div class="textarea-container mb-5" id="divStory" hidden>
+        <textarea id="txtStory" class="form-control" rows="8" placeholder="Describe your Story here..." maxlength="2500"></textarea>
+        <p id="txtStorySaved" hidden style="text-align:justify;"></p>
+        <button id="editStory" class="btn btn-sm btn-info" hidden>Edit</button>
+        <button id="saveStory" class="btn btn-sm btn-info">Save</button>
+        <small id="smallStoryCounter" class="text-muted" style="float:left;"><span class="StorycharCount">2500</span> / 2500 remaining</small>
+        <small id="smallStoryHint" class="text-muted" style="float:right;">max 2500 characters are allowed.</small>
+    </div>
+
+    <button hidden id="btnWish" href="#" class="btn btn-info btn-lg mb-3" style="width:320px;height:65px;">
+        <i class="bi bi-stars" style="vertical-align:middle;"></i>
+        <span>Wish</span>
+    </button>
+
+    <div class="textarea-container mb-5" id="divWish" hidden>
+        <textarea id="txtWish" class="form-control" rows="8" placeholder="Describe your Wish here..." maxlength="500"></textarea>
+        <p id="txtWishSaved" hidden style="text-align:justify;"></p>
+        <button id="editWish" class="btn btn-sm btn-info" hidden>Edit</button>
+        <button id="saveWish" class="btn btn-sm btn-info">Save</button>
+        <small id="smallWishCounter" class="text-muted" style="float:left;"><span class="WishcharCount">500</span> / 500 remaining</small>
+        <small id="smallWishHint" class="text-muted" style="float:right;">max 500 characters are allowed.</small>
+    </div>
+
+    <button id="btnSubmit" hidden class="btn btn-info mt-5" style="float:right;">Submit <i class="bi bi-arrow-right-circle"></i></button>
+</div>
+
+<script>
+    //for checking user profile completion
+    $(document).ready(function () {
+        if ('@User.Identity?.IsAuthenticated' == 'True') {
+            $.ajax({
+                url: "/Home/CheckUserProfileStatus",
+                data: {
+                    name: '@User.Identity?.Name'
+                },
+                success: function (data) {
+                    //debugger
+                    if (data == false) {
+                        //profile is not completed
+                        //For Cinderella
+                        $("#btnStory").attr("disabled", true);
+                        $("#btnDisabledTooltip").attr("data-bs-toggle", "tooltip");
+                        $("#btnDisabledTooltip").attr("data-bs-placement", "bottom");
+                        $("#btnDisabledTooltip").attr("title", "Please First Complete your Profile to add Stories!");
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+                        //For Fairy
+                        $("#btnStart").attr("disabled", true);
+                        $("#btnDisabledTooltip2").attr("data-bs-toggle", "tooltip");
+                        $("#btnDisabledTooltip2").attr("data-bs-placement", "bottom");
+                        $("#btnDisabledTooltip2").attr("title", "Please First Complete your Profile to Fetch Wishes!");
+                        $('[data-bs-toggle="tooltip"]').tooltip();
+
+                    } else {
+                        //profile is completed
+                        $("#btnStart").attr("disabled", false);
+                        $("#btnStart").attr("disabled", false);
+                    }
+                },
+                error: function (data) {
+                    alert(data);
+                }
+            })
+        }
+    })
+
+    window.addEventListener("beforeunload", () => {
+        localStorage.removeItem('storyId');
+        $("#txtStory").val("");
+        $("#txtWish").val("");
+    });
+    //For Saving Story and Wish Text to database
+    $("#btnSubmit").click(function () {
+        var storyText = $("#txtStory").val();
+        var wishText = $("#txtWish").val();
+
+        if (storyText == "" || wishText == "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Please enter your Story and Wish to Continue!',
+                confirmButtonText: "OK",
+                showCloseButton: true
+            });
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/Home/Save_Stories_Wishes",
+                data: {
+                    story: storyText,
+                    wish: wishText,
+                    id: localStorage.getItem("storyId")
+                },
+                success: function (data) {
+                    if (data == "Success") {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Congrats' + ' @User.Identity?.Name',
+                            text: 'You have started your jorney to the fairytale!',
+                            confirmButtonText: "Let's Go",
+                            showCloseButton: true,
+                            showClass: {
+                                popup: 'animate__animated animate__fadeInDown'
+                            },
+                            hideClass: {
+                                popup: 'animate__animated animate__fadeOutUp'
+                            },
+                            backdrop: `rgba(0,0,123,0.4)
+                                        url("../../images/cinderella.gif")
+                                        left top
+                                        no-repeat`
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = "/Wishes/Index";
+                            }
+                        })
+                        localStorage.removeItem("storyId");
+                    }
+                },
+                error: function () {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Something went wrong please try again later!',
+                        confirmButtonText: "OK",
+                        showCloseButton: true
+                    });
+                }
+            });
+        }
+    });
+
+
+
+    //For Showing red alerts and char counter
+    $('#txtStory').keyup(function () {
+        var max_length = 2500;
+        var len = max_length - $(this).val().length;
+        $('.StorycharCount').text(len);
+        if (len == 0) {
+            $("#smallStoryCounter").removeClass("text-muted");
+            $("#smallStoryCounter").addClass("text-danger");
+            $("#smallStoryHint").removeClass("text-muted");
+            $("#smallStoryHint").addClass("text-danger");
+        } else {
+            $("#smallStoryCounter").removeClass("text-danger");
+            $("#smallStoryCounter").addClass("text-muted");
+            $("#smallStoryHint").removeClass("text-danger");
+            $("#smallStoryHint").addClass("text-muted");
+        }
+    });
+
+    $('#txtWish').keyup(function () {
+        var max_length = 500;
+        var len = max_length - $(this).val().length;
+        $('.WishcharCount').text(len);
+        if (len == 0) {
+            $("#smallWishCounter").removeClass("text-muted");
+            $("#smallWishCounter").addClass("text-danger");
+            $("#smallWishHint").removeClass("text-muted");
+            $("#smallWishHint").addClass("text-danger");
+        } else {
+            $("#smallWishCounter").removeClass("text-danger");
+            $("#smallWishCounter").addClass("text-muted");
+            $("#smallWishHint").removeClass("text-danger");
+            $("#smallWishHint").addClass("text-muted");
+        }
+    });
+
+    ////////////////
+
+
+
+    /////for all the animations and effects on textboxes
+    $("#btnStory").click(function () {
+        $("#divStory").fadeIn(3000, "linear");
+        $("#divStory").attr("hidden", false);
+    });
+    $("#btnWish").click(function () {
+        $("#divWish").fadeIn(3000, "linear");
+        $("#divWish").attr("hidden", false);
+    });
+
+    $("#saveStory").click(function () {
+        var storyText = $("#txtStory").val();
+        if (storyText == null || storyText == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "Story can't be Empty!",
+                showCloseButton: true
+            });
+        } else {
+            $("#btnStory").attr("disabled", true);
+            $("#txtStory").fadeOut(3000, "linear");
+            $("#txtStory").attr("hidden", true);
+            $("#txtStorySaved").fadeIn(3000, "linear");
+            $("#txtStorySaved").attr("hidden", false);
+            $("#txtStorySaved").text($("#txtStory").val());
+
+            $("#saveStory").attr("hidden", true);
+            $("#editStory").attr("hidden", false);
+
+            $("#btnWish").attr("disabled", true);
+            $("#btnWish").fadeIn(3000, "linear");
+            $("#btnWish").attr("hidden", false);
+            $("#divWish").fadeIn(3000, "linear");
+            $("#divWish").attr("hidden", false);
+            //Saving story to database
+            $.ajax({
+                type: "POST",
+                url: "/Home/SaveStory",
+                data: {
+                    story: storyText,
+                    id: localStorage.getItem("storyId")
+                },
+                success: function (data) {
+                    sessionStorage.setItem("storyId", data);
+                    localStorage.setItem("storyId", data);
+                },
+                error: function (data) {
+                    alert(data);
+                }
+            })
+        }
+    });
+    $("#editStory").click(function () {
+        $("#editStory").attr("hidden", true);
+        $("#txtStorySaved").fadeOut(3000, "linear");
+        $("#txtStorySaved").attr("hidden", true);
+
+        $("#txtStory").fadeIn(3000, "linear");
+        $("#txtStory").attr("hidden", false);
+        $("#saveStory").attr("hidden", false);
+    });
+
+    $("#saveWish").click(function () {
+        var wishText = $("#txtWish").val();
+        if (wishText == null || wishText == "") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "Wish can't be Empty!",
+                showCloseButton: true
+            });
+        } else {
+            $("#btnWish").attr("disabled", true);
+            $("#txtWish").fadeOut(3000, "linear");
+            $("#txtWish").attr("hidden", true);
+            $("#txtWishSaved").fadeIn(3000, "linear");
+            $("#txtWishSaved").attr("hidden", false);
+            $("#txtWishSaved").text($("#txtWish").val());
+
+            $("#saveWish").attr("hidden", true);
+            $("#editWish").attr("hidden", false);
+
+            $("#btnSubmit").attr("hidden", true);
+            $("#btnSubmit").fadeIn(3000, "linear");
+            $("#btnSubmit").attr("hidden", false);
+
+            //for saving wish to database
+            $.ajax({
+                type: "POST",
+                url: "/Home/SaveWish",
+                data: {
+                    wish: wishText,
+                    id: localStorage.getItem("storyId")
+                },
+                success: function (data) {
+
+                },
+                error: function (data) {
+                    alert(data);
+                }
+            })
+        }
+    });
+    $("#editWish").click(function () {
+        $("#editWish").attr("hidden", true);
+        $("#txtWishSaved").fadeOut(3000, "linear");
+        $("#txtWishSaved").attr("hidden", true);
+
+        $("#txtWish").fadeIn(3000, "linear");
+        $("#txtWish").attr("hidden", false);
+        $("#saveWish").attr("hidden", false);
+    });
+
+    //function WishMaker(story, wish, id) {
+    //    return `<div class="col-6 mb-3">
+    //                <div class="card shadow-sm text-bg-light" id="Story_Wish_${id}">
+    //                    <div class="card-body">
+    //                        <h5 class="card-title">Story</h5>
+    //                        <p class="card-text">
+    //                        ${story}
+    //                        </p>
+    //                        <h5 class="card-title">Wish</h5>
+    //                        <p class="card-text">
+    //                            ${wish}
+    //                        </p>
+    //                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+    //                            <button type="button" class="btn btn-outline-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+    //                            <button type="button" class="btn btn-outline-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+    //                        </div>
+    //                    </div>
+    //                </div>
+    //            </div>`;
+    //}
+
+    //function WishMaker2(stroy, wish, id) {
+    //    return `<div class="col-12 mb-3">
+    //                <div class="card shadow-sm text-bg-light" id="Story_Wish_${id}">
+    //                <div class="card-body">
+    //                    <h5 class="card-title">Story</h5>
+    //                    <p class="card-text">
+    //                    ${stroy}
+    //                    </p>
+    //                    <h5 class="card-title">Wish</h5>
+    //                    <p class="card-text">
+    //                        ${wish}
+    //                    </p>
+    //                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+    //                        <button type="button" class="btn btn-outline-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+    //                        <button type="button" class="btn btn-outline-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+    //                    </div>
+    //                </div>
+    //            </div>
+    //        </div>`;
+    //}
+
+    //function LaunchWishes() {
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Wishes/GetRandomWishes",
+    //        success: function (data) {
+    //            if (data.length != 0) {
+    //                for (var i = 0; i < data.length; i++) {
+    //                    if (i == 2) {
+    //                        document.getElementById("WishContainer1").innerHTML += WishMaker2(data[i].storyText, data[i].wishText, data[i].id);
+    //                    } else {
+    //                        document.getElementById("WishContainer1").innerHTML += WishMaker(data[i].storyText, data[i].wishText, data[i].id);
+    //                    }
+    //                }
+    //                $("#WishesModal").modal("show");
+    //            } else {
+    //                Swal.fire({
+    //                    icon: "info",
+    //                    title: "No Wishes Found",
+    //                    text: "There are no wishes in the wish clouds! Please try fetching after some time."
+    //                })
+    //            }
+    //        },
+    //        error: function (data) {
+    //            alert(data);
+    //        }
+    //    })
+    //}
+
+    //function LaunchWishesAgain() {
+    //    $("#WishContainer1").empty();
+    //    $("#btnTryagain").attr("disabled", true);
+    //    document.getElementById("btnTryagain").innerHTML =
+    //        `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+    //                      Loading...`;
+    //    $.ajax({
+    //        type: "GET",
+    //        url: "/Wishes/GetRandomWishes",
+    //        success: function (data) {
+    //            if (data.length != 0) {
+    //                for (var i = 0; i < data.length; i++) {
+    //                    if (i == 2) {
+    //                        document.getElementById("WishContainer1").innerHTML += WishMaker2(data[i].storyText, data[i].wishText, data[i].id);
+    //                    } else {
+    //                        document.getElementById("WishContainer1").innerHTML += WishMaker(data[i].storyText, data[i].wishText, data[i].id);
+    //                    }
+    //                }
+    //            } else {
+    //                Swal.fire({
+    //                    icon: "info",
+    //                    title: "No Wishes Found",
+    //                    text: "There are no wishes in the wish clouds! Please try fetching after some time."
+    //                })
+    //            }
+    //            $("#btnTryagain").attr("disabled", false);
+    //            document.getElementById("btnTryagain").innerHTML = "<i class='bi bi-arrow-clockwise'></i> Try Again";
+    //        },
+    //        error: function (data) {
+    //            alert(data);
+    //        }
+    //    })
+    //}
+
+    //function AcceptWish(id) {
+    //    $.ajax({
+    //        type: "POST",
+    //        url: "/Wishes/AcceptWish",
+    //        data: {
+    //            id: id
+    //        },
+    //        success: function (data) {
+    //            Toastify({
+    //                text: "Wish Accepted Successfully!",
+    //                duration: 3000,
+    //                stopOnFocus: true,
+    //                style: {
+    //                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+    //                },
+    //            }).showToast();
+    //            //$("#btnAccept_" + id + "").text("Accepted");
+    //            //$("#btnAccept_" + id + "").attr("disabled", true);
+    //            $("#Story_Wish_" + id + "").fadeOut(2000, "linear");
+    //        },
+    //        error: function (data) {
+    //            alert(data);
+    //        }
+    //    })
+    //}
+    //function DeclineWish(id) {
+    //    $("#Story_Wish_" + id + "").fadeOut(2000, "linear");
+    //}
+
+</script>

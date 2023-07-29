@@ -1,0 +1,1256 @@
+﻿@model WishPaginationModel<cfeya_webapp.Models.Wishes>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Wishes";
+    ViewData["Controller"] = "Wishes";
+    ViewData["Action"] = "AllWishes";
+    var increment = 1;
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+}
+<style>
+    .clickabletd {
+        cursor: pointer;
+    }
+    .StatusDropdown {
+        display: flex;
+    }
+
+    body {
+        background-color: #D9AFD9;
+        background-image: linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%);
+        color:black
+    }
+
+
+
+    /*.card {
+        background-image: linear-gradient(rgb(68 68 68 / 50%), rgb(103 93 120)), url("../../images/FairyBackground.jfif");
+        background-color: black;
+        background-position:center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: whitesmoke;
+    }*/
+
+    .cardbody {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            background-size: 140%!important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            color:white;
+        }
+
+    @@ media (min-width: 992px) {
+        .body {
+            background-size: 148vh!important;
+            background-repeat: no-repeat !important;
+            background-position: 50% -31vh!important;
+        }
+    }
+
+    .row {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .social-row {
+        display: flex;
+        flex-direction: column;
+        right: 0;
+        position: absolute;
+    }
+
+    @@ media (min-width: 768px) {
+        .social-row {
+            position: relative;
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+    }
+
+    .social-row a {
+        width: 2em;
+        height: 2em;
+        background-repeat: no-repeat;
+        background-size: contain;
+        padding: 1em 0;
+        z-index: 99;
+        margin-bottom: 1em;
+        margin-right: 1em;
+    }
+
+    @@ media (min-width: 768px) {
+        .social-row a {
+            width: 2.5em;
+            height: 2.5em;
+            padding: 1em 0;
+            margin-bottom: 0;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .social-row a {
+            width: 3em;
+            height: 3em;
+            padding: 0;
+        }
+    }
+
+    .countach {
+        font-family: countach,sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .tilda-petite {
+        font-family: tilda-petite,sans-serif;
+        font-weight: 400;
+        font-style: normal;
+    }
+
+    .montserrat {
+        font-family: montserrat, sans-serif;
+        font-weight: 300;
+        font-style: normal;
+    }
+
+    .skintone-text {
+        color: var(--skintone-color);
+    }
+
+    .dark-text {
+        color: var(--dark-color);
+    }
+
+    .white-text {
+        color: #fff;
+    }
+
+    a:hover {
+        color: #c2c2c2;
+    }
+
+    .dark-background {
+        background: var(--dark-color);
+    }
+
+
+    .logo {
+        width: 20vh;
+    }
+
+    @@ media (min-width: 768px) {
+        .logo {
+            width: 16em;
+        }
+    }
+
+    @@ media (min-width: 992px) {
+        .logo {
+            width: 18em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .logo {
+            width: 28vh;
+            height: 28vh;
+        }
+    }
+
+    h1 {
+        font-size: 4.5vh;
+        letter-spacing: 4px;
+        padding-top: .5em;
+    }
+
+    @@ media (min-width: 992px) {
+        h1 {
+            font-size: 2.75em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        h1 {
+            font-size: 3em;
+            letter-spacing: 5px;
+        }
+    }
+
+    .lead {
+        font-size: 1.5rem;
+        padding-top: 0.5em;
+    }
+
+    @@ media (min-width: 992px) {
+        .lead {
+            font-size: 2rem;
+            padding-top: 0.5em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .lead {
+            font-size: 2.5rem;
+            padding-top: 1em;
+        }
+    }
+
+    p.general {
+        font-size: 2.5vh;
+        margin-bottom: 0.5em;
+        line-height: 1.25em;
+    }
+
+    @@ media (min-width: 992px) {
+        p.general {
+            font-size: 1.25em;
+             line-height: 1.5em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        p.general {
+            font-size: 1.5em;
+        }
+    }
+
+
+    .inner-border {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .outer-border {
+        border: 2px solid #DE9B72;
+        height: 99%;
+        width: 98%;
+        padding: 6px;
+        margin: 0 auto;
+    }
+
+    @@ media (min-width: 992px) {
+        .outer-border {
+            height: 94%;
+        }
+    }
+
+    .mid-border {
+        border: 6px solid #DE9B72;
+        height: 100%;
+        width: 100%;
+        padding: 6px;
+        margin: auto;
+    }
+
+    .inner-border {
+        position: relative;
+        border: 2px solid #DE9B72;
+        height: 100%;
+        width: 100%;
+        margin: auto;
+    }
+
+
+    
+    .corner-decoration {
+        position: absolute;
+        width: 3em;
+        margin: -3px;
+    }
+
+    @@ media (min-width: 768px) {
+        .corner-decoration {
+            width: 3.5em;
+            margin: -4px;
+        }
+    }
+
+    @@ media (min-width: 992px) {
+        .corner-decoration {
+            width: 4em;
+            margin: -5px;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .corner-decoration {
+            width: 5em;
+            margin: -6px;
+        }
+    }
+
+    .corner-decoration.corner-left-top {
+        left: 0;
+        top: 0;
+    }
+
+    .corner-decoration.corner-right-top {
+        top: 0;
+        right: 0;
+         -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+    }
+
+    .corner-decoration.corner-right-bottom {
+        right: 0;
+        bottom: 0;
+         -webkit-transform: scale(-1);
+        transform: scale(-1);
+    }
+
+    .corner-decoration.corner-left-bottom {
+        left: 0;
+        bottom: 0;
+        -webkit-transform: scaleY(-1);
+        transform: scaleY(-1);
+    }
+
+
+    .vertical-decoration {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        width: 11em;
+    }
+
+
+    @@ media(min-width: 768px) {
+        .vertical-decoration {
+            width: 16em;
+        }
+    }
+
+
+    @@ media (min-width: 992px) {
+        .vertical-decoration {
+            width: 20em;
+        }
+    }
+
+    @@ media (min-width: 1200px) {
+        .vertical-decoration {
+            width: 27em;
+        }
+    }
+
+    .vertical-decoration.top {
+        top: 0;
+
+    }
+
+    .vertical-decoration.bottom {
+        bottom: 0;
+        -webkit-transform: scaleY(-1);
+        transform: scaleY(-1);
+    }
+
+</style>
+
+<small style="float:right;margin-right:12px;cursor:pointer" data-bs-toggle="tooltip" title="Discover more wishes"
+       data-bs-placement="left" onclick="LaunchWishes()"
+       class="text-form text-success"><i class="bi bi-search"></i> Discover More</small>
+
+<h1>Wishes</h1>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th style="width:25%;">
+                Story
+            </th>
+            <th>
+                Wish
+            </th>
+            <th>
+                Created Date
+            </th>
+            <th>
+                Submitted Date
+            </th>
+            <th>
+                Picked up Date
+            </th>
+            <th>
+                Address to Send
+            </th>
+            <th>
+                <div class="dropdown" data-bs-toggle="tooltip" title="Filter Wishes by Status">
+                    <button class="btn dropdown-toggle"
+                            style="border:none;"
+                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <b>Status</b>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/Wishes/AllWishes"><i class="bi bi-check2-square"></i> All</a>
+                        </li>
+                        @* <li>
+                        <a class="dropdown-item" href="/Wishes/AllWishes?status=Floating in the Wish Clouds"><i class="bi bi-check-circle"></i> Active</a>
+                        </li>*@
+                        <li>
+                            <a class="dropdown-item" href="/Wishes/AllWishes?status=Discovered by a Fairy"><i class="bi bi-search"></i> Discovered</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/Wishes/AllWishes?status=Wish is being Fulfilled"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/Wishes/AllWishes?status=Fulfilled"><i class="bi bi-check2-circle"></i> Completed</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/Wishes/AllWishes?status=Received"><i class="bi bi-person-check"></i> Accepted</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </th>
+
+        </tr>
+    </thead>
+    <tbody class="table-group-divider">
+        @foreach (var item in Model)
+        {
+            <tr id="Wish_Story_@item.Id">
+                <td>
+                    @increment
+                </td>
+                <td class="clickabletd" onclick="LoadWish(@item.Id)" style="width:25%;" data-bs-toggle="tooltip" title="Click to view Full Story" data-bs-placement="bottom">
+                    @if (item.StoryText?.Length > 70)
+                    {
+                        @item.StoryText.Substring(0, 70)
+
+                        <small class="text-muted form-text">...</small>
+                    }
+                    else
+                    {
+                        @item.StoryText
+                    }
+                </td>
+                <td class="clickabletd" onclick="LoadWish(@item.Id)" data-bs-toggle="tooltip" title="Click to view Full Wish" data-bs-placement="bottom">
+                    @if (item.WishText?.Length > 150)
+                    {
+                        @item.WishText.Substring(0, 150)
+
+                        <small class="text-muted form-text">...</small>
+                    }
+                    else
+                    {
+                        @item.WishText
+                    }
+                </td>
+                <td>
+                    @item.CreatedDate?.ToShortDateString()
+                </td>
+                <td>
+                    @item.SubmitedDate?.ToShortDateString()
+                </td>
+                <td id="pickedupdate_@item.Id">
+                    @item.Picked_up_date?.ToShortDateString()
+                </td>
+                <td>
+                    @{
+                        var user = UserManager.FindByNameAsync(item.CreatedBy).Result;
+                    }
+                    Cinderella 800 Washington @user.Street, @user.City, @user.State, @user.Zip
+                </td>
+                <td>
+                    <div class="StatusDropdown" id="WishStatus_@item.Id">
+                        @*@if (item.Status == "Floating in the Wish Clouds")
+                    {
+                    <button class="badge" style="border:none;border-radius: 50rem;
+                    border-top-right-radius: 0rem;background-color:#0D6EFD;
+                    border-bottom-right-radius: 0rem;" type="button">
+                    <i class="bi bi-check-circle"></i>
+                    Active
+                    </button>
+                    <button type="button" style="border:none;
+                    border-radius: 50rem;background-color:#0D6EFD;
+                    border-top-left-radius: 0rem;
+                    border-bottom-left-radius: 0rem;"
+                    class="badge dropdown-toggle dropdown-toggle-split"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>
+                    }
+                    else*@
+                        @if (item.Status == "Discovered by a Fairy")
+                        {
+                            <button class="badge" style="border:none;border-radius: 50rem;
+                            border-top-right-radius: 0rem;background-color:#6610f2;
+                            border-bottom-right-radius: 0rem;" type="button">
+                                <i class="bi bi-search"></i>
+                                Discovered
+                            </button>
+                            <button type="button" style="border:none;
+                            border-radius: 50rem;background-color:#6610f2;
+                            border-top-left-radius: 0rem;
+                            border-bottom-left-radius: 0rem;"
+                            class="badge dropdown-toggle dropdown-toggle-split"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                        }
+                        else if (item.Status == "Wish is being Fulfilled")
+                        {
+                            <button class="badge" style="border:none;border-radius: 50rem;
+                            border-top-right-radius: 0rem;background-color:#20c997;
+                            border-bottom-right-radius: 0rem;" type="button">
+                                <i class="bi bi-clipboard-check"></i>
+                                Fullfiling
+                            </button>
+                            <button type="button" style="border:none;
+                            border-radius: 50rem;background-color:#20c997;
+                            border-top-left-radius: 0rem;
+                            border-bottom-left-radius: 0rem;"
+                            class="badge dropdown-toggle dropdown-toggle-split"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                        }
+                        else if (item.Status == "Fulfilled")
+                        {
+                            <button class="badge" style="border:none;border-radius: 50rem;
+                            border-top-right-radius: 0rem;background-color:#198754;
+                            border-bottom-right-radius: 0rem;" type="button">
+                                <i class="bi bi-check2-circle"></i>
+                                Completed
+                            </button>
+                            <button type="button" style="border:none;
+                            border-radius: 50rem;background-color:#198754;
+                            border-top-left-radius: 0rem;
+                            border-bottom-left-radius: 0rem;"
+                            class="badge dropdown-toggle dropdown-toggle-split"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <span class="badge rounded-pill" style="background-color:#ffc107;">
+                                <i class="bi bi-person-check"></i> @item.Status
+                            </span>
+                            @*<button class="badge" style="border:none;border-radius: 50rem;
+                    border-top-right-radius: 0rem;background-color:#ffc107;
+                    border-bottom-right-radius: 0rem;" type="button">
+                    <i class="bi bi-person-check"></i>
+                    Accepted
+                    </button>
+                    <button type="button" style="border:none;
+                    border-radius: 50rem;background-color:#ffc107;
+                    border-top-left-radius: 0rem;
+                    border-bottom-left-radius: 0rem;"
+                    class="badge dropdown-toggle dropdown-toggle-split"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                    </button>*@
+                        }
+                        <ul class="dropdown-menu">
+                            @*<li onclick="ChangeWishStatus(@item.Id, 'Floating in the Wish Clouds','#0D6EFD')">
+                        <a class="dropdown-item"><i class="bi bi-check-circle"></i> Active</a>
+                        </li>*@
+                            <li>
+                                <a href="JavaScript:ChangeWishStatus(@item.Id, 'Discovered by a Fairy','#6610f2')" class="dropdown-item"><i class="bi bi-search"></i> Discovered</a>
+                            </li>
+                            <li>
+                                <a href="JavaScript:ChangeWishStatus(@item.Id, 'Wish is being Fulfilled','#20c997')" class="dropdown-item"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+                            </li>
+                            <li>
+                                <a href="JavaScript:ChangeWishStatus(@item.Id, 'Fulfilled','#198754')" class="dropdown-item"><i class="bi bi-check2-circle"></i> Completed</a>
+                            </li>
+                            @*<li onclick="ChangeWishStatus(@item.Id, 'Received','#ffc107')">
+                        <a class="dropdown-item"><i class="bi bi-person-check"></i> Accepted</a>
+                        </li>*@
+                        </ul>
+                    </div>
+
+                </td>
+                <td>
+                    @if (item.Status == "Discovered by a Fairy")
+                    {
+                        <i onclick="CancelWish(@item.Id)" class="bi bi-x-circle form-text text-danger"
+                   data-bs-toggle="tooltip"
+                   title="Cancel this Wish"
+                   style="cursor:pointer;"></i>
+                    }
+                </td>
+            </tr>
+            increment++;
+        }
+    </tbody>
+</table>
+
+<partial name="_PaginationPartial" model="Model" view-data="ViewData" />
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="WishDetailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Wish Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:justify;">
+                    <h4 style="text-align:center;">Story</h4>
+                    <p id="txtStory"></p>
+                    <h4 style="text-align:center;">Wish</h4>
+                    <p id="txtWish"></p><hr />
+                    <div class="row" style="text-align:center;">
+                        <div class="col-md-4">
+                            <span data-bs-toggle="tooltip" title="Wish Created Date">
+                                <i class="bi bi-calendar-event"></i>
+                                <span class="form-text" id="createdDate"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-4">
+                            <span data-bs-toggle="tooltip" title="Wish Submitted Date">
+                                <i class="bi bi-calendar-check"></i>
+                                <span class="form-text" id="submitedDate"></span>
+                            </span>
+                        </div>
+                        <div class="col-md-4" id="StatusBadge">
+                            @*<span class="badge rounded-pill" style="background-color:#0D6EFD" data-bs-toggle="tooltip" title="Wish Status">
+                            <i class="bi bi-check-circle"></i>
+                            <span id="wishStatus"></span>
+                            </span>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center w-100">
+    <div id="NoDataToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                No Wishes Found. Please First Add Some!
+                <a style="color:white;" href="/Home/Index" data-bs-toggle="tooltip" title="Click to Add Wish"><i class="bi bi-plus-square"></i></a>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="WishesModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-dark" id="exampleModalLabel">
+                    Pick Wishes
+                </h5>
+                <button type="button"
+                        class="btn btn-info"
+                        id="btnTryagain"
+                        data-bs-placement="bottom"
+                        data-bs-toggle="tooltip" title="Fetch more wishes" onclick="LaunchWishesAgain()">
+                    <i class="bi bi-arrow-clockwise"></i> Try Again
+                </button>
+                <a class="btn btn-secondary"
+                   data-bs-toggle="tooltip" title="Close and go to Wishes"
+                   asp-area="" asp-controller="Wishes" asp-action="AllWishes">
+                    Close
+                </a>
+                @*<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>*@
+            </div>
+            <div class="modal-body"
+                 style="background-image:linear-gradient(rgb(68 68 68 / 50%), rgb(103 93 120)), url('../../images/FairyBackground.jfif');
+                    background-color: black;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    color:black;">
+                <div class="container text-center">
+
+                    <div id="WishContainer1" class="row mb-3">
+                        @*<div class="col-6 mb-3">
+                        <div class="card">
+                        <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                        </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                        <div class="card">
+                        <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                        </div>
+                        </div>*@
+                    </div>
+
+
+                    @*<div id="WishContainer2" class="row mb-3">
+                    <div class="card">
+                    <div class="card-body">
+                    <h5 class="card-title">Special title treatment</h5>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                    </div>
+                    </div>
+
+                    <div id="WishContainer3" class="row">
+                    <div class="col-6">
+                    <div class="card">
+                    <div class="card-body">
+                    <h5 class="card-title">Special title treatment</h5>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                    </div>
+                    </div>
+                    <div class="col-6">
+                    <div class="card">
+                    <div class="card-body">
+                    <h5 class="card-title">Special title treatment</h5>
+                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                    </div>
+                    </div>
+                    </div>*@
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    function WishMaker(story, wish, id) {
+        return `<div class="col-6 mb-3 col6wishes" id="Story_Wish_${id}">
+                        <div class="cardbody">
+                              <div class="outer-border">
+                                 <div class="mid-border">
+                                    <div class="inner-border">
+                                      <img class="corner-decoration corner-left-top" src="/images/corner-decoration.png"></img>
+                                      <img class="corner-decoration corner-right-top" src="/images/corner-decoration.png"></img>
+                                      <img class="corner-decoration corner-right-bottom" src="/images/corner-decoration.png"></img>
+                                          <img class="corner-decoration corner-left-bottom" src="/images/corner-decoration.png"></img>
+                                          <img class="vertical-decoration top" src="/images/horizontally-centered-vertical-decoration.png">
+                                          <img class="vertical-decoration bottom" src="/images/horizontally-centered-vertical-decoration.png">
+
+                                       <!-- Page Content -->
+                                           <div class="container" style="margin-top: 35px;margin-bottom: 40px;">
+
+                                          <div class="row">
+
+                                             <div class="col-lg-12 text-center">
+                                                <h5 class="card-title">Story</h5>
+                                                <p class="card-text">
+                                                ${story}
+                                                </p>
+                                                <h5 class="card-title">Wish</h5>
+                                                <p class="card-text">
+                                                    ${wish}
+                                                </p>
+                                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                                    <button type="button" class="btn btn-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+                                                    <button type="button" class="btn btn-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+                                                </div>
+
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                        </div>
+                </div>`;
+    }
+
+    function WishMaker2(story, wish, id) {
+        return `<div class="col-12 mb-3">
+                            <div class="cardbody" id="Story_Wish_${id}">
+                              <div class="outer-border">
+                                 <div class="mid-border">
+                                    <div class="inner-border">
+                                      <img class="corner-decoration corner-left-top" src="/images/corner-decoration.png"></img>
+                                      <img class="corner-decoration corner-right-top" src="/images/corner-decoration.png"></img>
+                                      <img class="corner-decoration corner-right-bottom" src="/images/corner-decoration.png"></img>
+                                      <img class="corner-decoration corner-left-bottom" src="/images/corner-decoration.png"></img>
+                                      <img class="vertical-decoration top" src="/images/horizontally-centered-vertical-decoration.png">
+                                      <img class="vertical-decoration bottom" src="/images/horizontally-centered-vertical-decoration.png">
+
+                                       <!-- Page Content -->
+                                           <div class="container" style="margin-top: 35px;margin-bottom: 40px;">
+
+                                          <div class="row">
+
+                                             <div class="col-lg-12 text-center">
+                                                <h5 class="card-title">Story</h5>
+                                                <p class="card-text">
+                                                ${story}
+                                                </p>
+                                                <h5 class="card-title">Wish</h5>
+                                                <p class="card-text">
+                                                    ${wish}
+                                                </p>
+                                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                                    <button type="button" class="btn btn-danger" id="btnDecline_${id}" onclick="DeclineWish(${id})">Decline</button>
+                                                    <button type="button" class="btn btn-success" id="btnAccept_${id}" onclick="AcceptWish(${id})">Accept</button>
+                                                </div>
+
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                        </div>
+                </div>`;
+    }
+
+    function LaunchWishes() {
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/GetRandomWishes",
+            success: function (data) {
+                if (data.length != 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 2) {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker2(data[i].storyText, data[i].wishText, data[i].id);
+                        } else {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker(data[i].storyText, data[i].wishText, data[i].id);
+                        }
+                    }
+                    $("#WishesModal").modal("show");
+                    ChangeWishSize();
+                } else {
+                    Swal.fire({
+                        icon: "info",
+                        title: "No Wishes Found",
+                        text: "There are no wishes in the wish clouds! Please try fetching after some time."
+                    })
+                }
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+
+    function LaunchWishesAgain() {
+        $("#WishContainer1").empty();
+        $("#btnTryagain").attr("disabled", true);
+        document.getElementById("btnTryagain").innerHTML =
+            `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                          Loading...`;
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/GetRandomWishes",
+            success: function (data) {
+                if (data.length != 0) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (i == 2) {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker2(data[i].storyText, data[i].wishText, data[i].id);
+                        } else {
+                            document.getElementById("WishContainer1").innerHTML += WishMaker(data[i].storyText, data[i].wishText, data[i].id);
+                        }
+                    }
+                    ChangeWishSize();
+                }else{
+                    Swal.fire({
+                        icon:"info",
+                        title:"No Wishes Found",
+                        text:"There are no wishes in the wish clouds! Please try fetching after some time."
+                    })
+                }
+                $("#btnTryagain").attr("disabled", false);
+                document.getElementById("btnTryagain").innerHTML = "<i class='bi bi-arrow-clockwise'></i> Try Again";
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+
+    function AcceptWish(id) {
+        $.ajax({
+            type: "POST",
+            url: "/Wishes/AcceptWish",
+            data: {
+                id: id
+            },
+            success: function (data) {
+                Toastify({
+                    text: "Wish Accepted Successfully!",
+                    duration: 3000,
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    },
+                }).showToast();
+                $("#Story_Wish_" + id + "").fadeOut(2000, "linear");
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+    function DeclineWish(id) {
+        $("#Story_Wish_" + id + "").fadeOut(2000, "linear");
+    }
+
+    function StatusCellChanger(id, status, color) {
+        //if (status == "Floating in the Wish Clouds") {
+        //    return `
+        //                <button class="badge" style="border:none;border-radius: 50rem;
+        //                            border-top-right-radius: 0rem;background-color:#0D6EFD;
+        //                            border-bottom-right-radius: 0rem;" type="button">
+        //                                <i class="bi bi-check-circle"></i>
+        //                                Active
+        //                            </button>
+        //                            <button type="button" style="border:none;
+        //                            border-radius: 50rem;background-color:#0D6EFD;
+        //                            border-top-left-radius: 0rem;
+        //                            border-bottom-left-radius: 0rem;"
+        //                            class="badge dropdown-toggle dropdown-toggle-split"
+        //                            data-bs-toggle="dropdown" aria-expanded="false">
+        //                                <span class="visually-hidden">Toggle Dropdown</span>
+        //                                </button>
+
+        //                                <ul class="dropdown-menu">
+        //                                <li onclick="ChangeWishStatus(${id}, 'Floating in the Wish Clouds','#0D6EFD')">
+        //                                    <a class="dropdown-item"><i class="bi bi-check-circle"></i> Active</a>
+        //                                </li>
+        //                                <li onclick="ChangeWishStatus(${id}, 'Discovered by a Fairy','#6610f2')">
+        //                                    <a class="dropdown-item"><i class="bi bi-search"></i> Discovered</a>
+        //                                </li>
+        //                                <li onclick="ChangeWishStatus(${id}, 'Wish is being Fulfilled','#20c997')">
+        //                                    <a class="dropdown-item"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+        //                                </li>
+        //                                <li onclick="ChangeWishStatus(${id}, 'Fulfilled','#198754')">
+        //                                    <a class="dropdown-item"><i class="bi bi-check2-circle"></i> Completed</a>
+        //                                </li>
+        //                                <li onclick="ChangeWishStatus(${id}, 'Received','#ffc107')">
+        //                                    <a class="dropdown-item"><i class="bi bi-person-check"></i> Accepted</a>
+        //                                </li>
+        //                            </ul>
+        //        `;
+        //} else
+        if (status == "Discovered by a Fairy") {
+            return `
+                                    <button class="badge" style="border:none;border-radius: 50rem;
+                                        border-top-right-radius: 0rem;background-color:#6610f2;
+                                        border-bottom-right-radius: 0rem;" type="button">
+                                            <i class="bi bi-search"></i>
+                                            Discovered
+                                        </button>
+                                        <button type="button" style="border:none;
+                                        border-radius: 50rem;background-color:#6610f2;
+                                        border-top-left-radius: 0rem;
+                                        border-bottom-left-radius: 0rem;"
+                                        class="badge dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="visually-hidden">Toggle Dropdown</span>
+                                            </button>
+
+                                            <ul class="dropdown-menu">
+
+                                            <li>
+                                                <a href="JavaScript:ChangeWishStatus(${id}, 'Discovered by a Fairy','#6610f2')" class="dropdown-item"><i class="bi bi-search"></i> Discovered</a>
+                                            </li>
+                                            <li>
+                                                <a href="JavaScript:ChangeWishStatus(${id}, 'Wish is being Fulfilled','#20c997')" class="dropdown-item"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+                                            </li>
+                                            <li>
+                                                <a href="JavaScript:ChangeWishStatus(${id}, 'Fulfilled','#198754')" class="dropdown-item"><i class="bi bi-check2-circle"></i> Completed</a>
+                                            </li>
+
+                                        </ul>
+                        `;
+        } else if (status == "Wish is being Fulfilled") {
+            return `
+                                    <button class="badge" style="border:none;border-radius: 50rem;
+                                        border-top-right-radius: 0rem;background-color:#20c997;
+                                        border-bottom-right-radius: 0rem;" type="button">
+                                            <i class="bi bi-clipboard-check"></i>
+                                            Fullfiling
+                                        </button>
+                                        <button type="button" style="border:none;
+                                        border-radius: 50rem;background-color:#20c997;
+                                        border-top-left-radius: 0rem;
+                                        border-bottom-left-radius: 0rem;"
+                                        class="badge dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="visually-hidden">Toggle Dropdown</span>
+                                            </button>
+
+                                            <ul class="dropdown-menu">
+
+                                                <li>
+                                                    <a href="JavaScript:ChangeWishStatus(${id}, 'Discovered by a Fairy','#6610f2')" class="dropdown-item"><i class="bi bi-search"></i> Discovered</a>
+                                                </li>
+                                                <li>
+                                                    <a href="JavaScript:ChangeWishStatus(${id}, 'Wish is being Fulfilled','#20c997')" class="dropdown-item"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+                                                </li>
+                                                <li>
+                                                    <a href="JavaScript:ChangeWishStatus(${id}, 'Fulfilled','#198754')" class="dropdown-item"><i class="bi bi-check2-circle"></i> Completed</a>
+                                                </li>
+                                        </ul>
+                        `;
+        } else if (status == "Fulfilled") {
+            return `
+                                    <button class="badge" style="border:none;border-radius: 50rem;
+                                        border-top-right-radius: 0rem;background-color:#198754;
+                                        border-bottom-right-radius: 0rem;" type="button">
+                                            <i class="bi bi-check2-circle"></i>
+                                            Completed
+                                        </button>
+                                        <button type="button" style="border:none;
+                                        border-radius: 50rem;background-color:#198754;
+                                        border-top-left-radius: 0rem;
+                                        border-bottom-left-radius: 0rem;"
+                                        class="badge dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="visually-hidden">Toggle Dropdown</span>
+                                            </button>
+
+                                            <ul class="dropdown-menu">
+
+                                                <li>
+                                                    <a href="JavaScript:ChangeWishStatus(${id}, 'Discovered by a Fairy','#6610f2')" class="dropdown-item"><i class="bi bi-search"></i> Discovered</a>
+                                                </li>
+                                                <li>
+                                                    <a href="JavaScript:ChangeWishStatus(${id}, 'Wish is being Fulfilled','#20c997')" class="dropdown-item"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+                                                </li>
+                                                <li>
+                                                    <a href="JavaScript:ChangeWishStatus(${id}, 'Fulfilled','#198754')" class="dropdown-item"><i class="bi bi-check2-circle"></i> Completed</a>
+                                                </li>
+                                        </ul>
+                        `;
+        } else {
+            return `
+                                    <button class="badge" style="border:none;border-radius: 50rem;
+                                        border-top-right-radius: 0rem;background-color:#ffc107;
+                                        border-bottom-right-radius: 0rem;" type="button">
+                                            <i class="bi bi-person-check"></i>
+                                            Accepted
+                                        </button>
+                                        <button type="button" style="border:none;
+                                        border-radius: 50rem;background-color:#ffc107;
+                                        border-top-left-radius: 0rem;
+                                        border-bottom-left-radius: 0rem;"
+                                        class="badge dropdown-toggle dropdown-toggle-split"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="visually-hidden">Toggle Dropdown</span>
+                                        </button>
+
+                                        <ul class="dropdown-menu">
+
+                                            <li>
+                                                <a href="JavaScript:ChangeWishStatus(${id}, 'Discovered by a Fairy','#6610f2')" class="dropdown-item"><i class="bi bi-search"></i> Discovered</a>
+                                            </li>
+                                            <li>
+                                                <a href="JavaScript:ChangeWishStatus(${id}, 'Wish is being Fulfilled','#20c997')" class="dropdown-item"><i class="bi bi-clipboard-check"></i> Fullfiling</a>
+                                            </li>
+                                            <li>
+                                                <a href="JavaScript:ChangeWishStatus(${id}, 'Fulfilled','#198754')" class="dropdown-item"><i class="bi bi-check2-circle"></i> Completed</a>
+                                            </li>
+                                    </ul>
+                        `;
+        }
+
+    }
+
+    function ChangeWishStatus(wishId, statusValue, statusColor) {
+
+        $.ajax({
+            type: "POST",
+            url: "/Wishes/ChangeStatus",
+            data: {
+                id: wishId,
+                status: statusValue
+            },
+            success: function (data) {
+                if (data == "Success") {
+                    Toastify({
+                        text: "Wish Status Updated Successfully!",
+                        duration: 3000,
+                        stopOnFocus: true,
+                        style: {
+                            background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        },
+                    }).showToast();
+                    $("#WishStatus_" + wishId + "").html(StatusCellChanger(wishId, statusValue, statusColor));
+                    var now = new Date().toISOString().split('T')[0];
+                    if (document.getElementById("pickedupdate_8").innerText == "") {
+                        $("#pickedupdate_" + wishId + "").text(now);
+                    }
+                }
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+
+    }
+
+    $(document).ready(function () {
+        if (@Model.Count() == 0 && '@User.IsInRole("Cinderella")' == 'True') {
+            const toast = new bootstrap.Toast("#NoDataToast")
+            toast.show()
+        }
+    });
+
+    function LoadWish(wishID) {        
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/LoadWishDetails",
+            data: {
+                wishID: wishID
+            },
+            success: function (data) {
+                $("#WishDetailModal").modal("show");
+                $("#txtStory").text(data.storyText);
+                $("#txtWish").text(data.wishText);
+                $("#StatusBadge").html(WishStatusMaker(data.status, data.id));
+                $("#createdDate").text(data.createdDate.split('T')[0]);
+                $("#submitedDate").text(data.submitedDate.split('T')[0]);
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            },
+            error: function (data) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data
+                });
+            }
+        });
+    }
+
+    function WishStatusMaker(Status, id) {
+        //if (Status == "Floating in the Wish Clouds") {
+        //    return `
+        //                                    <span id="hellotip" class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#0D6EFD;">
+        //                                            <i class="bi bi-check-circle"></i> Active
+        //                                    </span>`;
+        //}
+        //else
+        if (Status == "Discovered by a Fairy") {
+            return `
+                                                <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#6610f2;">
+                                                    <i class="bi bi-search"></i> Discovered
+                                                </span>`;
+        }
+        else if (Status == "Wish is being Fulfilled") {
+            return `
+                                                <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#20c997;">
+                                                        <i class="bi bi-clipboard-check"></i> Fullfiling
+                                                </span>`;
+        }
+        else if (Status == "Fulfilled") {
+            return `
+                                                <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#198754;">
+                                                    <i class="bi bi-check2-circle"></i> Completed
+                                                </span>`;
+        }
+        else {
+            return `
+                                                <span class="badge rounded-pill" data-bs-toggle="tooltip" title="Wish Status" style="cursor:pointer;background-color:#ffc107;">
+                                                    <i class="bi bi-person-check"></i> ${Status}
+                                                </span>`;
+        }
+    }
+
+    function FilterWishbyStatus(status) {
+        $.ajax({
+            type: "GET",
+            url: "/Wishes/AllWishes",
+            data: {
+                status: status
+            },
+            success: function (data) {
+
+            },
+            error: function (data) {
+                alert(data);
+            }
+        })
+    }
+
+    function CancelWish(wishid) {
+        Swal.fire({
+            icon: "warning",
+            title: "Are you sure?",
+            text: "If you are not able to fulfill the wish then cancel the Wish. Otherwise click No!",
+            showCloseButton: true,
+            showCancelButton: true,
+            cancelButtonText: "<i class='bi bi-slash-circle'></i> No",
+            confirmButtonText: "<i class='bi bi-x-circle'></i> Cancel Wish"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Wishes/SentWishtoCloud",
+                    data: {
+                        id: wishid
+                    },
+                    success: function (data) {
+                        if (data == "Success") {
+                            Toastify({
+                                text: "Wish Cancelled Successfully!",
+                                duration: 2000,
+                                stopOnFocus: true,
+                                style: {
+                                            background: "lightred",
+                                       },
+                            }).showToast();
+                            $("#Wish_Story_"+wishid+"").fadeOut(2000,"linear")
+                        }else{
+                            alert(data);
+                        }
+                    },
+                    error: function (data) {
+                        alert(data)
+                    }
+                })
+            }
+        })
+    }
+
+    function ChangeWishSize() {
+        if (window.innerWidth <= 750) {
+            var wishesLength = document.getElementsByClassName("col-6").length
+            if(wishesLength>0){
+                for(var i=0;i<wishesLength;i++){
+                    document.getElementsByClassName("col-6")[0].classList.remove("col-6")
+                }
+            }
+        }else{
+            var wishesLength = document.getElementsByClassName("col6wishes").length
+            if (wishesLength > 0) {
+                for (var i = 0; i < wishesLength; i++) {
+                    document.getElementsByClassName("col6wishes")[i].classList.add("col-6")
+                }
+            }
+        }        
+    };
+    window.addEventListener("resize", ChangeWishSize);
+
+</script>

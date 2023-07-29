@@ -1,0 +1,90 @@
+﻿@model cfeya_webapp.Models.ContactForm
+@{
+    ViewData["Title"] = "Contact Us"; 
+    var notification = TempData["msg"];
+}
+
+<style>
+    #firstname, #lastname, #emailaddress, #message {
+        background-color:transparent;
+        color:white;
+    }
+    .contactForm{
+        border: 2px solid;
+        border-radius: 12px;
+        padding: 10px;
+    }
+</style>
+
+<h1>Contact Us</h1>
+
+@if (notification != null)
+{
+    <div class="alert alert-warning" role="alert">
+        <i class="bi bi-check-circle-fill" style="margin-right:10px;"></i>
+        @TempData["msg"]
+        <button type="button" style="float:right;" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form asp-action="ContactUs">
+
+    <div class="row">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6 contactForm">
+            <h3 class="text-center">Get in touch with us</h3>
+            <h6 class="text-center">We are happy to help</h6>
+
+            <div class="text-center">
+                <img src="~/images/feyafavicon.png" alt="Feya Logo" height="100px;" />
+            </div>
+            <div class="row">
+                <div class="col-md-6 ">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Firstname" class="form-control" id="firstname" placeholder="First Name" required />
+                        <label class="form-label">First Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Lastname" class="form-control" id="lastname" placeholder="Last Name" required />
+                        <label class="form-label">Last Name</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <input asp-for="Email" type="email" class="form-control" id="emailaddress" placeholder="Email Address" required />
+                        <label class="form-label">Email Address</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-floating">
+                        <textarea asp-for="Message" class="form-control" placeholder="Describe your Message here..." 
+                        id="message" style="height: 150px" required></textarea>
+                        <label class="form-label">Message</label>
+                    </div>
+                </div>
+            </div>
+            <button style="background-color:#6ea8fe;" class="btn btn-lg" type="submit"><i class="bi bi-send"></i> Send Message</button>
+        </div>
+        <div class="col-md-3">
+        </div>
+    </div>
+</form>
+
+
+
+<div class="callout callout-warning">
+    <p>Please visit  <a style="color:#6ea8fe;" href="https://www.cfeya.com/Home/Rules">  Rules & Instrcutions </a>  page before contacting us.</p>
+
+    <p>
+        Support Email: <a style="color:#6ea8fe;" href="mailto:dreamcomestrue@cfeya.com">dreamcomestrue@cfeya.com</a>
+    </p>
+
+</div>
+

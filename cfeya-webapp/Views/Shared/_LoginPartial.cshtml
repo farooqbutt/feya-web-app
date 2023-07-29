@@ -1,0 +1,158 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject cfeya_webapp.Data.ApplicationDbContext Context
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var ProfilePic = UserManager.GetUserAsync(User).Result.ProfilePicture;
+        var data = Context;
+        var notificationCount = new List<Notification>();
+        if (data != null)
+        {
+            notificationCount = data.Notifications
+            .Where(a => a.UserId == UserManager.GetUserAsync(User).Result.Id && a.MarkasRead == false).ToList();
+        }
+        @if(User.IsInRole("Cinderella"))
+        {
+            <li class="nav-item">
+                <a class="nav-link position-relative text-dark" data-bs-toggle="tooltip" title="Notifications"
+                data-bs-placement="left"
+           href="/Wishes/Notifications" id="notifications">
+                    <i class="bi bi-bell"></i>
+                    @if (notificationCount?.Count() != 0)
+                    {
+                        <span style="font-size:9px;" class="position-absolute top-10 start-99 translate-middle badge rounded-pill bg-danger">
+                            @notificationCount?.Count()
+                        </span>
+                    }
+                </a>
+            </li>
+        }
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="#">@User.Identity?.Name!</a>
+        </li>
+        <li class="nav-item">
+            <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a style="padding:2px 0px 0px 0px;" class="nav-link text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            My Account
+                            @if (ProfilePic != null)
+                            {
+                                <img style="width:40px;height:40px; object-fit:cover;border-radius:30px;" src="@ProfilePic">
+                            }
+                            else
+                            {
+                                <img style="width:40px;height:40px; object-fit:cover;border-radius:30px;background-color:white;" src="~/images/person-bounding-box.svg">
+                            }
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-light">
+                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="bi bi-person"></i> Profile</a></li>
+                            @if(User.IsInRole("Cinderella"))
+                            {
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Wishes" asp-action="Index"><i class="bi bi-stars"></i> Wishes</a></li>
+                            }
+                            else
+                            {
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Wishes" asp-action="AllWishes"><i class="bi bi-stars"></i> Wishes</a></li>
+                            }
+                            <li><a class="dropdown-item" href="JavaScript:ChangeRole()"><i class="bi bi-arrow-left-right"></i> Switch Account</a></li>
+                            
+                            <li>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="JavaScript:LogOut()">
+                                    <i class="bi bi-box-arrow-left"></i> Sign Out
+                                </a>
+                                <form hidden class="form-inline dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                    <button type="submit" class="nav-link btn btn-link text-light dropdown-item"><i class="bi bi-box-arrow-left"></i> Sign Out</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        @*<li class="nav-item">
+
+    </li>*@
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="btn btn-outline-dark me-2" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+        <li class="nav-item">
+            <a class="btn btn-warning" asp-area="Identity" asp-page="/Account/Register">Sign-up</a>
+        </li>
+    }
+</ul>
+
+
+<script>
+    function LogOut(){
+        document.forms[0].submit();
+    }
+
+    function ChangeRole() {
+        Swal.fire({
+            title: 'Are you sure to Convert?',
+            text: "You can be able to revert this later!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, do it!',
+            showLoaderOnConfirm: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if ('@User.IsInRole("Cinderella")' == 'True') {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/ChangeRole",
+                        data: {
+                            Current_role: "Cinderella",
+                            new_Role: "Fairy"
+                        },
+                        success: function (data) {
+                            Swal.fire(
+                                'Congrats!',
+                                'Your are now Fairy.',
+                                'success'
+                            ).then((result) => {
+                                window.location.href = "/Home/Fairy"
+                            })
+                        },
+                        error: function (data) {
+                            alert(data);
+                        }
+                    })
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/ChangeRole",
+                        data: {
+                            Current_role: "Fairy",
+                            new_Role: "Cinderella"
+                        },
+                        success: function (data) {
+                            Swal.fire(
+                                'Congrats!',
+                                'Your are now Cinderella.',
+                                'success'
+                            ).then((result) => {
+                                window.location.href = "/Home/Cinderella"
+                            })
+                        },
+                        error: function (data) {
+                            alert(data);
+                        }
+                    })
+                }
+            }
+        })
+
+    }
+</script>
